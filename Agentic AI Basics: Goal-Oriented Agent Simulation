@@ -1,0 +1,70 @@
+import random
+import matplotlib.pyplot as plt
+
+class Agent:
+    def __init__(self, name, goal, position=(0, 0)):
+        self.name = name
+        self.goal = goal  # Target position to reach
+        self.position = position  # Current position
+        self.history = [position]  # Track position history for visualization
+
+    def move(self):
+        x, y = self.position
+        goal_x, goal_y = self.goal
+        new_x = x + (1 if goal_x > x else -1 if goal_x < x else 0)
+        new_y = y + (1 if goal_y > y else -1 if goal_y < y else 0)
+        self.position = (new_x, new_y)
+        self.history.append(self.position)
+
+    def has_reached_goal(self):
+        return self.position == self.goal
+
+def create_agents(num_agents, area_size=10):
+    agents = []
+    for i in range(num_agents):
+        start_x, start_y = random.randint(0, area_size), random.randint(0, area_size)
+        goal_x, goal_y = random.randint(0, area_size), random.randint(0, area_size)
+        
+        agent = Agent(name=f"Agent_{i+1}", goal=(goal_x, goal_y), position=(start_x, start_y))
+        agents.append(agent)
+    
+    return agents
+
+
+def simulate_agents(agents, max_steps=20):
+    for step in range(max_steps):
+        all_reached_goal = True
+        for agent in agents:
+            if not agent.has_reached_goal():
+                agent.move()
+                all_reached_goal = False
+        
+        if all_reached_goal:
+            print(f"All agents have reached their goals in {step+1} steps!")
+            break
+
+
+def plot_agents(agents, area_size=10):
+    plt.figure(figsize=(8, 8))
+    plt.xlim(0, area_size)
+    plt.ylim(0, area_size)
+    
+    for agent in agents:
+        x_history, y_history = zip(*agent.history)
+        plt.plot(x_history, y_history, marker='o', label=agent.name)
+        plt.scatter(*agent.goal, color="red", marker="x", s=100)  # Goal marker
+
+    plt.legend()
+    plt.title("Agent Movements Toward Goals")
+    plt.xlabel("X Position")
+    plt.ylabel("Y Position")
+    plt.grid()
+    plt.show()
+
+area_size = 10
+num_agents = 5
+agents = create_agents(num_agents, area_size)
+
+print("Simulating agent movement towards goals...")
+simulate_agents(agents)
+plot_agents(agents, area_size)
